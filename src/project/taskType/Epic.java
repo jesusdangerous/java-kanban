@@ -1,0 +1,42 @@
+package project.taskType;
+
+import project.taskStatus.Status;
+
+import java.util.ArrayList;
+
+public class Epic extends Task{
+
+    private ArrayList<Integer> subtasksById = new ArrayList<>();
+    public Epic(String name, String description, Status status) {
+        super(name, description, status);
+    }
+
+    public ArrayList<Integer> getSubtasks() {
+        return subtasksById;
+    }
+
+    public void setSubtasks(ArrayList<Integer> subtasksById) {
+        this.subtasksById = subtasksById;
+    }
+
+    public void addSubtask(Integer subtaskId) {
+        subtasksById.add(subtaskId);
+    }
+
+    public void deleteSubtask(Integer subtaskId) {
+        subtasksById.remove(subtaskId);
+    }
+
+    public void deleteAllSubtasks() {
+        subtasksById.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "Epic { name = " + getName() +
+                ", description = " + getDescription() +
+                ", status = " + getStatus() +
+                ", id = " + getId() +
+                ", subtaskById = " + getSubtasks() + " }";
+    }
+}
