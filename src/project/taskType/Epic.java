@@ -2,20 +2,22 @@ package project.taskType;
 
 import project.taskStatus.Status;
 
+import java.util.List;
 import java.util.ArrayList;
 
-public class Epic extends Task{
+public class Epic extends Task {
 
-    private ArrayList<Integer> subtasksById = new ArrayList<>();
+    private List<Integer> subtasksById = new ArrayList<>();
+
     public Epic(String name, String description, Status status) {
         super(name, description, status);
     }
 
-    public ArrayList<Integer> getSubtasks() {
+    public List<Integer> getSubtasks() {
         return subtasksById;
     }
 
-    public void setSubtasks(ArrayList<Integer> subtasksById) {
+    public void setSubtasks(List<Integer> subtasksById) {
         this.subtasksById = subtasksById;
     }
 
