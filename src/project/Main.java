@@ -1,5 +1,7 @@
 package project;
 
+import project.manager.InMemoryTaskManager;
+import project.manager.Managers;
 import project.manager.TaskManager;
 import project.taskStatus.Status;
 import project.taskType.Epic;
@@ -9,7 +11,7 @@ import project.taskType.Task;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         Task task1 = new Task("Выполнить дела по дому", "Сделать генеральную уборку", Status.NEW);
         Task task2 = new Task("Заняться спортом", "Подтянуться 10 раз", Status.NEW);
@@ -51,5 +53,30 @@ public class Main {
         System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getAllEpics());
         System.out.println(taskManager.getAllSubtasks());
+
+        System.out.println("----------------------------------------");
+
+        Task task5 = new Task("Выполнить дела по дому", "Сделать генеральную уборку", Status.NEW);
+        Task task6 = new Task("Заняться спортом", "Подтянуться 10 раз", Status.NEW);
+        taskManager.addNewTask(task5);
+        taskManager.addNewTask(task6);
+
+        Epic epic7 = new Epic("Сделать домашнее задание", "Выполнить физику и математику", Status.NEW);
+        taskManager.addNewEpic(epic7);
+        Subtask subtask8 = new Subtask("Выполнить физику", "Сделать лабу", Status.NEW, epic7.getId());
+        Subtask subtask9 = new Subtask("Выполнить математику", "Сделать рассчетную", Status.NEW, epic7.getId());
+        taskManager.addNewSubtask(subtask8);
+        taskManager.addNewSubtask(subtask9);
+
+        Epic epic10 = new Epic("Нарисовать плакат", "Использовать все краски", Status.IN_PROGRESS);
+        taskManager.addNewEpic(epic10);
+        Subtask subtask11 = new Subtask("Нарисовать облака", "Использовать баллончик", Status.NEW, epic10.getId());
+        taskManager.addNewSubtask(subtask11);
+
+        taskManager.getTaskById(task5.getId());
+        taskManager.getTaskById(task6.getId());
+        taskManager.getEpicById(epic7.getId());
+
+        System.out.println(taskManager.getHistory());
     }
 }
