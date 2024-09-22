@@ -3,14 +3,12 @@ package project.tests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import project.manager.HistoryManager;
 import project.manager.InMemoryTaskManager;
 import project.manager.TaskManager;
 import project.taskStatus.Status;
 import project.taskType.Epic;
 import project.taskType.Task;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
