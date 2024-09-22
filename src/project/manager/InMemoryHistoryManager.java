@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedList;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node<Task>> history = new HashMap<>();
     private Node<Task> tail;
     private Node<Task> head;
