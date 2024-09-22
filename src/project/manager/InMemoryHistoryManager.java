@@ -30,6 +30,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             System.out.println("Ошибка: попытка удалить несуществующую задачу");
         }
     }
+
     @Override
     public List<Task> getHistory() {
         return getTasks();
