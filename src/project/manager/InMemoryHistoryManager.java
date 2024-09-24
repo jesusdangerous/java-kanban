@@ -63,15 +63,26 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void removeNode(Node<Task> node) {
         if (node != null) {
-            if (node.getPrevious() != null) {
-                node.getPrevious().setNext(node.getNext());
-            } else {
+            if (node == head && node == tail) {
+                head = null;
+                tail = null;
+            } else if (node == head) {
                 head = node.getNext();
-            }
-            if (node.getNext() != null) {
-                node.getNext().setPrevious(node.getPrevious());
-            } else {
+                if (head != null) {
+                    head.setPrevious(null);
+                }
+            } else if (node == tail) {
                 tail = node.getPrevious();
+                if (tail != null) {
+                    tail.setNext(null);
+                }
+            } else {
+                if (node.getPrevious() != null) {
+                    node.getPrevious().setNext(node.getNext());
+                }
+                if (node.getNext() != null) {
+                    node.getNext().setPrevious(node.getPrevious());
+                }
             }
         } else {
             System.out.println("Ошибка: попытка удалить пустой узел");

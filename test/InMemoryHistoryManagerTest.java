@@ -5,6 +5,7 @@ import project.manager.InMemoryTaskManager;
 import project.manager.TaskManager;
 import project.taskStatus.Status;
 import project.taskType.Epic;
+import project.taskType.Subtask;
 import project.taskType.Task;
 
 import java.util.LinkedList;
@@ -163,6 +164,70 @@ public class InMemoryHistoryManagerTest {
         expectedList.add(task4);
         expectedList.add(task5);
         expectedList.add(task6);
+
+        Assertions.assertEquals(expectedList, taskManager.getHistory());
+    }
+
+    @Test
+    void shouldEmptyHistoryIfDeleteAllTasks() {
+        Task task1 = new Task("Задача1", "Сделать1", Status.NEW);
+        taskManager.addNewTask(task1);
+        Task task2 = new Task("Задача2", "Сделать2", Status.NEW);
+        taskManager.addNewTask(task2);
+        Task task3 = new Task("Задача3", "Сделать3", Status.NEW);
+        taskManager.addNewTask(task3);
+
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task1.getId());
+
+        taskManager.deleteAllTasks();
+
+        List<Task> expectedList = new LinkedList<>();
+
+        Assertions.assertEquals(expectedList, taskManager.getHistory());
+    }
+
+    @Test
+    void shouldEmptyHistoryIfDeleteAllSubtasks() {
+        Epic epic1 = new Epic("Задача1", "Сделать1", Status.NEW);
+        taskManager.addNewEpic(epic1);
+        Subtask subtask1 = new Subtask("Задача2", "Сделать2", Status.NEW, epic1.getId());
+        taskManager.addNewSubtask(subtask1);
+        Subtask subtask2 = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId());
+        taskManager.addNewSubtask(subtask2);
+
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getSubtaskById(subtask1.getId());
+        taskManager.getSubtaskById(subtask2.getId());
+
+        List<Task> expectedList = new LinkedList<>();
+        expectedList.add(epic1);
+
+        taskManager.deleteAllSubtasks();
+
+        Assertions.assertEquals(expectedList, taskManager.getHistory());
+    }
+
+    @Test
+    void shouldEmptyHistoryIfDeleteAllEpics() {
+        Epic epic1 = new Epic("Задача1", "Сделать1", Status.NEW);
+        taskManager.addNewEpic(epic1);
+        Epic epic2 = new Epic("Задача2", "Сделать2", Status.NEW);
+        taskManager.addNewEpic(epic2);
+        Epic epic3 = new Epic("Задача3", "Сделать3", Status.NEW);
+        taskManager.addNewEpic(epic3);
+        Subtask subtask2 = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId());
+        taskManager.addNewSubtask(subtask2);
+
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getEpicById(epic2.getId());
+        taskManager.getEpicById(epic3.getId());
+        taskManager.getSubtaskById(subtask2.getId());
+
+        List<Task> expectedList = new LinkedList<>();
+
+        taskManager.deleteAllEpics();
 
         Assertions.assertEquals(expectedList, taskManager.getHistory());
     }
