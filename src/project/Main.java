@@ -1,7 +1,6 @@
 package project;
 
 import project.manager.InMemoryTaskManager;
-import project.manager.Managers;
 import project.manager.TaskManager;
 import project.taskStatus.Status;
 import project.taskType.Epic;
@@ -76,6 +75,54 @@ public class Main {
         taskManager.getTaskById(task5.getId());
         taskManager.getTaskById(task6.getId());
         taskManager.getEpicById(epic7.getId());
+
+        System.out.println(taskManager.getHistory());
+
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllEpics();
+        taskManager.deleteAllSubtasks();
+
+        System.out.println("----------------------------------------");
+
+        Task task12 = new Task("Выполнить 1", "Сделать 1", Status.NEW);
+        Task task13 = new Task("Выполнить 2", "Сделать 2", Status.NEW);
+
+        taskManager.addNewTask(task12);
+        taskManager.addNewTask(task13);
+
+        Epic epic14 = new Epic("Нарисовать 3", "Использовать 3", Status.IN_PROGRESS);
+
+        taskManager.addNewEpic(epic14);
+
+        Subtask subtask15 = new Subtask("Выполнить 4", "Сделать 4", Status.NEW, epic14.getId());
+        Subtask subtask16 = new Subtask("Выполнить 5", "Сделать 5", Status.NEW, epic14.getId());
+
+        taskManager.addNewSubtask(subtask15);
+        taskManager.addNewSubtask(subtask16);
+
+        Epic epic17 = new Epic("Сделать 6", "Выполнить 6", Status.NEW);
+
+        taskManager.addNewEpic(epic17);
+
+        taskManager.getTaskById(task13.getId());
+        taskManager.getEpicById(epic17.getId());
+        taskManager.getEpicById(epic14.getId());
+        taskManager.getSubtaskById(subtask15.getId());
+        taskManager.getTaskById(task13.getId());
+        taskManager.getTaskById(task12.getId());
+        taskManager.getEpicById(epic17.getId());
+        taskManager.getTaskById(task12.getId());
+        taskManager.getTaskById(task12.getId());
+
+        System.out.println(taskManager.getHistory());
+        System.out.println("---");
+
+        taskManager.deleteTask(task13.getId());
+
+        System.out.println(taskManager.getHistory());
+        System.out.println("---");
+
+        taskManager.deleteEpicById(epic17.getId());
 
         System.out.println(taskManager.getHistory());
     }

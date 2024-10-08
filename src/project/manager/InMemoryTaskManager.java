@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InMemoryTaskManager implements TaskManager{
+public class InMemoryTaskManager implements TaskManager {
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
     private Integer id = 0;
@@ -30,6 +30,9 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void deleteAllTasks() {
+        for (Integer id : tasks.keySet()) {
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
 
@@ -72,6 +75,7 @@ public class InMemoryTaskManager implements TaskManager{
     public void deleteTask(Integer id) {
         if (tasks.containsKey(id)) {
             tasks.remove(id);
+            historyManager.remove(id);
         } else {
             System.out.println("Ошибка: задача с таким id не существует");
         }
@@ -84,6 +88,9 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void deleteAllSubtasks() {
+        for (Integer id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.deleteAllSubtasks();
@@ -140,6 +147,7 @@ public class InMemoryTaskManager implements TaskManager{
             Epic epic = epics.get(subtasks.remove(id).getEpicId());
             epic.deleteSubtask(id);
             updateEpicStatus(epic);
+            historyManager.remove(id);
         } else {
             System.out.println("Ошибка: такой id не найден");
         }
@@ -183,6 +191,12 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void deleteAllEpics() {
+        for (Integer id : epics.keySet()) {
+            historyManager.remove(id);
+        }
+        for (Integer id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         epics.clear();
         subtasks.clear();
     }
@@ -222,6 +236,7 @@ public class InMemoryTaskManager implements TaskManager{
             for (Integer subtaskId : subtasksById) {
                 subtasks.remove(subtaskId);
             }
+            historyManager.remove(id);
         } else {
             System.out.println("Ошибка: эпик с таким id не существует");
         }
