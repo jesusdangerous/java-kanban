@@ -49,8 +49,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addNewTask(Task task) {
         if (task != null) {
-            Integer id = getGeneratedId();
-            task.setId(id);
+            if (task.getId() == null) {
+                Integer id = getGeneratedId();
+                task.setId(id);
+            }
             tasks.put(task.getId(), task);
         } else {
             System.out.println("Ошибка: попытка добавить пустую задачу");
@@ -113,10 +115,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask != null) {
             Epic epic = epics.get(subtask.getEpicId());
             if (epic != null) {
-                Integer id = getGeneratedId();
-                subtask.setId(id);
-                subtasks.put(id, subtask);
-                epic.addSubtask(id);
+                if (subtask.getId() == null) {
+                    subtask.setId(getGeneratedId());
+                }
+                subtasks.put(subtask.getId(), subtask);
+                epic.addSubtask(subtask.getId());
                 updateEpicStatus(epic);
             } else {
                 System.out.println("Ошибка: такой эпик не обнаружен");
@@ -204,9 +207,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addNewEpic(Epic epic) {
         if (epic != null) {
-            Integer id = getGeneratedId();
-            epic.setId(id);
-            epics.put(id, epic);
+            if (epic.getId() == null) {
+                epic.setId(getGeneratedId());
+            }
+            epics.put(epic.getId(), epic);
         } else {
             System.out.println("Ошибка: попытка добавить пустой эпик");
         }
