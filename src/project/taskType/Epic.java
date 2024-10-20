@@ -33,6 +33,10 @@ public class Epic extends Task {
         subtasksById.clear();
     }
 
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
     @Override
     public String toString() {
         return "Epic { name = " + getName() +
