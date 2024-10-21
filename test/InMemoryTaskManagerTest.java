@@ -8,8 +8,13 @@ import project.taskType.Epic;
 import project.taskType.Subtask;
 import project.taskType.Task;
 
-public class InMemoryTaskManagerTest {
-    private TaskManager taskManager;
+public class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
+    protected TaskManager taskManager;
+
+    @Override
+    protected TaskManager createTaskManager() {
+        return new InMemoryTaskManager();
+    }
 
     @BeforeEach
     void create() {

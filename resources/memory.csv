@@ -1,4 +1,4 @@
-id,type,name,status,description,epic
+id,type,name,status,description,start_time,duration,epic
 1,TASK,Выполнить дела по дому,NEW,Сделать генеральную уборку,
 2,TASK,Заняться спортом,NEW,Подтянуться 10 раз,
 3,EPIC,Сделать домашнее задание,NEW,Выполнить физику и математику,
