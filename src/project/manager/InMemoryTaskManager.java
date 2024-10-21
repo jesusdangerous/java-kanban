@@ -67,7 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (updatedTask != null) {
             Integer taskId = updatedTask.getId();
             if (tasks.containsKey(taskId)) {
-                prioritizedTasks.remove(tasks.get(taskId));
+                prioritizedTasks.removeIf(task -> task.getId().equals(updatedTask.getId()));
                 tasks.put(taskId, updatedTask);
                 addTaskInPrioritizedTasks(updatedTask);
             } else {
@@ -127,7 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.addSubtask(subtask.getId());
                 updateEpicStatus(epic);
                 updateEpicTime(epic);
-                addTaskInPrioritizedTasks(epic);
+                addTaskInPrioritizedTasks(subtask);
             } else {
                 System.out.println("Ошибка: такой эпик не обнаружен");
             }
@@ -141,9 +141,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask != null) {
             Epic epic = epics.get(subtask.getEpicId());
             if (epic != null) {
-                prioritizedTasks.remove(subtasks.get(subtask.getId()));
+                prioritizedTasks.removeIf(task -> task.getId().equals(subtask.getId()));
                 subtasks.put(subtask.getId(), subtask);
-                addTaskInPrioritizedTasks(epic);
+                addTaskInPrioritizedTasks(subtask);
                 updateEpicStatus(epic);
                 updateEpicTime(epic);
             } else {
