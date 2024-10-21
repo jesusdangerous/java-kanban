@@ -312,7 +312,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void addTaskInPrioritizedTasks(Task task) {
-        if (task.getStartTime() != null && task.getDuration() != null ) {
+        if (task.getStartTime() != null && task.getDuration() != null) {
             if (!isTaskIntersection(task)) {
                 prioritizedTasks.add(task);
             }
