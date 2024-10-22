@@ -67,6 +67,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (updatedTask != null) {
             Integer taskId = updatedTask.getId();
             if (tasks.containsKey(taskId)) {
+                if (isTaskIntersection(updatedTask)) {
+                    return;
+                }
                 prioritizedTasks.removeIf(task -> task.getId().equals(updatedTask.getId()));
                 tasks.put(taskId, updatedTask);
                 addTaskInPrioritizedTasks(updatedTask);
@@ -141,6 +144,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask != null) {
             Epic epic = epics.get(subtask.getEpicId());
             if (epic != null) {
+                if (isTaskIntersection(subtask)) {
+                    return;
+                }
                 prioritizedTasks.removeIf(task -> task.getId().equals(subtask.getId()));
                 subtasks.put(subtask.getId(), subtask);
                 addTaskInPrioritizedTasks(subtask);
@@ -301,10 +307,24 @@ public class InMemoryTaskManager implements TaskManager {
         return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2);
     }
 
-    private boolean isTaskIntersection(Task task) {
-        return prioritizedTasks.stream()
-                .filter(this::hasValidTimeRange)
-                .anyMatch(existingTask -> checkIntersections(existingTask, task));
+    private boolean isTaskIntersection(Task newTask) {
+        Task excitedTask = prioritizedTasks.stream()
+                .filter(task -> task.getId().equals(newTask.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (excitedTask != null) {
+            prioritizedTasks.removeIf(task -> task.getId().equals(newTask.getId()));
+        }
+
+        boolean hasIntersection = prioritizedTasks.stream()
+                .anyMatch(task -> checkIntersections(newTask, task));
+
+        if (excitedTask != null && hasIntersection) {
+            prioritizedTasks.add(excitedTask);
+        }
+
+        return hasIntersection;
     }
 
     private boolean hasValidTimeRange(Task task) {
