@@ -275,10 +275,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.updateSubtask(subtask2);
 
-        System.out.println(taskManager.getSubtaskById(subtask2.getId()).getStartTime());
-
-        System.out.println(taskManager.getPrioritizedTasks());
-
         Assertions.assertEquals(List.of(subtask2, task1, task2, subtask1), taskManager.getPrioritizedTasks());
     }
 
