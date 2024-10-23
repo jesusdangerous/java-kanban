@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     protected T taskManager;
@@ -272,7 +274,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addNewSubtask(subtask2);
 
         subtask2.setStartTime(LocalDateTime.of(2024, 10, 22, 2, 0));
-
         taskManager.updateSubtask(subtask2);
 
         Assertions.assertEquals(List.of(subtask2, task1, task2, subtask1), taskManager.getPrioritizedTasks());
@@ -290,7 +291,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         Task taskToUpdate = new Task("Задача1", "Описание1", Status.NEW, startTime.plus(oneHour), oneHour);
         taskToUpdate.setId(task.getId());
-        taskManager.updateTask(taskToUpdate);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            taskManager.updateTask(taskToUpdate);
+        }, "Task with id=1 has intersection");
 
         Assertions.assertEquals(List.of(task, collisionTask), taskManager.getPrioritizedTasks());
     }
@@ -310,8 +314,42 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Subtask subtaskToUpdate1 = new Subtask("Подзача2", "Сделать2", Status.NEW, epic1.getId(),
                 LocalDateTime.of(2024, 10, 22, 15, 0), Duration.ofHours(2));
         subtaskToUpdate1.setId(subtask1.getId());
-        taskManager.updateSubtask(subtaskToUpdate1);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            taskManager.updateSubtask(subtaskToUpdate1);
+        }, "Subtask with id=2 has intersection");
 
         Assertions.assertEquals(List.of(subtask1, subtask2), taskManager.getPrioritizedTasks());
+    }
+
+    @Test
+    void shouldConsistencyMapAndSet() {
+        Task task1 = new Task("Задача1", "Описание1", Status.NEW,
+                LocalDateTime.of(2024, 10, 22, 10, 0), Duration.ofHours(1));
+        taskManager.addNewTask(task1);
+
+        Task task2 = new Task("Задача2", "Описание2", Status.NEW,
+                LocalDateTime.of(2024, 10, 22, 11, 0), Duration.ofHours(1));
+        taskManager.addNewTask(task2);
+
+        Task task3 = new Task("Задача3", "Описание3", Status.NEW);
+        taskManager.addNewTask(task3);
+
+        Task task4 = new Task("Задача3", "Описание3", Status.NEW, null, null);
+        taskManager.addNewTask(task4);
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+        Assertions.assertTrue(prioritizedTasks.contains(task1));
+        Assertions.assertTrue(prioritizedTasks.contains(task2));
+        Assertions.assertFalse(prioritizedTasks.contains(task3));
+        Assertions.assertFalse(prioritizedTasks.contains(task4));
+
+        Map<Integer, Task> tasks = taskManager.getAllTasks().stream()
+                .collect(Collectors.toMap(Task::getId, task -> task));
+
+        prioritizedTasks.forEach(task -> Assertions.assertTrue(tasks.containsKey(task.getId())));
+        tasks.values().stream()
+                .filter(task -> task.getStartTime() != null && task.getDuration() != null)
+                .forEach(task -> Assertions.assertTrue(prioritizedTasks.contains(task)));
     }
 }

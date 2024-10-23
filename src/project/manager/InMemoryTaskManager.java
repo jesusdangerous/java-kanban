@@ -64,21 +64,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task updatedTask) {
-        if (updatedTask != null) {
-            Integer taskId = updatedTask.getId();
-            if (tasks.containsKey(taskId)) {
-                if (isTaskIntersection(updatedTask)) {
-                    return;
-                }
-                prioritizedTasks.removeIf(task -> task.getId().equals(updatedTask.getId()));
-                tasks.put(taskId, updatedTask);
-                addTaskInPrioritizedTasks(updatedTask);
-            } else {
-                System.out.println("Ошибка: задача с таким id не существует");
-            }
-        } else {
-            System.out.println("Ошибка: попытка обновить задачу пустым значением");
+        Objects.requireNonNull(updatedTask, "Task for update must not be null");
+        var taskId = updatedTask.getId();
+        if (!tasks.containsKey(taskId)) {
+            throw new IllegalArgumentException("No task by id %s".formatted(taskId));
         }
+        var oldTask = tasks.get(taskId);
+        prioritizedTasks.removeIf(task -> task.getId().equals(oldTask.getId()));
+        if (hasIntersections(updatedTask)) {
+            prioritizedTasks.add(oldTask);
+            throw new IllegalArgumentException("Task with id=%s has intersection".formatted(taskId));
+        }
+        tasks.put(taskId, updatedTask);
+        prioritizedTasks.add(updatedTask);
     }
 
     @Override
@@ -141,23 +139,34 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        if (subtask != null) {
-            Epic epic = epics.get(subtask.getEpicId());
-            if (epic != null) {
-                if (isTaskIntersection(subtask)) {
-                    return;
-                }
-                prioritizedTasks.removeIf(task -> task.getId().equals(subtask.getId()));
-                subtasks.put(subtask.getId(), subtask);
-                addTaskInPrioritizedTasks(subtask);
-                updateEpicStatus(epic);
-                updateEpicTime(epic);
-            } else {
-                System.out.println("Ошибка: такой эпик не обнаружен");
-            }
-        } else {
-            System.out.println("Ошибка: попытка обновить задачу пустым значением");
+        Objects.requireNonNull(subtask, "Subtask for update must not be null");
+        var subtaskId = subtask.getId();
+        if (!subtasks.containsKey(subtaskId)) {
+            throw new IllegalArgumentException("No subtask by id %s".formatted(subtaskId));
         }
+        var epicId = subtask.getEpicId();
+        if (!epics.containsKey(epicId)) {
+            throw new IllegalArgumentException("No epic by id %s".formatted(subtaskId));
+        }
+        var epic = epics.get(epicId);
+        if (!epic.getSubtasks().contains(subtaskId)) {
+            throw new IllegalArgumentException("Subtask with id=%s is not related to epic with id=%s".formatted(subtaskId, epicId));
+        }
+        var oldSubtask = subtasks.get(subtaskId);
+        prioritizedTasks.removeIf(task -> task.getId().equals(oldSubtask.getId()));
+        if (hasIntersections(subtask)) {
+            prioritizedTasks.add(oldSubtask);
+            throw new IllegalArgumentException("Subtask with id=%s has intersection".formatted(subtaskId));
+        }
+        subtasks.put(subtaskId, subtask);
+        prioritizedTasks.add(subtask);
+        updateEpicStatus(epic);
+        updateEpicTime(epic);
+    }
+
+    private boolean hasIntersections(Task newTask) {
+        return prioritizedTasks.stream()
+                .anyMatch(task -> checkIntersections(newTask, task));
     }
 
     @Override
@@ -307,33 +316,9 @@ public class InMemoryTaskManager implements TaskManager {
         return startTime1.isBefore(endTime2) && endTime1.isAfter(startTime2);
     }
 
-    private boolean isTaskIntersection(Task newTask) {
-        Task excitedTask = prioritizedTasks.stream()
-                .filter(task -> task.getId().equals(newTask.getId()))
-                .findFirst()
-                .orElse(null);
-
-        if (excitedTask != null) {
-            prioritizedTasks.removeIf(task -> task.getId().equals(newTask.getId()));
-        }
-
-        boolean hasIntersection = prioritizedTasks.stream()
-                .anyMatch(task -> checkIntersections(newTask, task));
-
-        if (excitedTask != null && hasIntersection) {
-            prioritizedTasks.add(excitedTask);
-        }
-
-        return hasIntersection;
-    }
-
-    private boolean hasValidTimeRange(Task task) {
-        return task.getStartTime() != null && task.getEndTime() != null;
-    }
-
     private void addTaskInPrioritizedTasks(Task task) {
         if (task.getStartTime() != null && task.getDuration() != null) {
-            if (!isTaskIntersection(task)) {
+            if (!hasIntersections(task)) {
                 prioritizedTasks.add(task);
             }
         }
