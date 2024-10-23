@@ -11,8 +11,13 @@ import project.taskType.Task;
 import java.util.LinkedList;
 import java.util.List;
 
-public class InMemoryHistoryManagerTest {
+public class InMemoryHistoryManagerTest extends TaskManagerTest<TaskManager> {
     private TaskManager taskManager;
+
+    @Override
+    protected TaskManager createTaskManager() {
+        return new InMemoryTaskManager();
+    }
 
     @BeforeEach
     void create() {
