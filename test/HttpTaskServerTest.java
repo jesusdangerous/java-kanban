@@ -89,7 +89,7 @@ public class HttpTaskServerTest {
         HttpRequest request2 = HttpRequest.newBuilder()
                 .uri(URI.create(URL + "/tasks"))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(taskToJson1))
+                .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
                 .build();
 
         HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
