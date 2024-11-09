@@ -2,6 +2,7 @@ package project.manager.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
+import project.exceptions.TaskTimeConflictException;
 import project.manager.TaskManager;
 import project.taskType.Subtask;
 
@@ -85,15 +86,13 @@ public class SubtaskHandler extends BaseHttpHandler {
     private void handleUpdateSubtask(HttpExchange exchange, String body) throws IOException {
         try {
             Subtask subtask = gson.fromJson(body, Subtask.class);
-            if (taskManager.getSubtaskById(subtask.getId()) != null) {
-                taskManager.updateSubtask(subtask);
-                sendCreated(exchange, "Подзача обновлена");
-            } else {
-                sendNotFound(exchange);
-            }
+            taskManager.updateSubtask(subtask);
+            sendCreated(exchange, "Подзача обновлена");
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange);
         } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
+        } catch (TaskTimeConflictException e) {
             sendHasInteractions(exchange);
         }
     }
@@ -105,14 +104,12 @@ public class SubtaskHandler extends BaseHttpHandler {
         }
         try {
             Integer subtaskId = Integer.parseInt(splitStrings[2]);
-            if (taskManager.getSubtaskById(subtaskId) != null) {
                 taskManager.deleteSubtaskById(subtaskId);
                 sendText(exchange, "Подзача удалена");
-            } else {
-                sendNotFound(exchange);
-            }
         } catch (NumberFormatException e) {
             sendBadRequest(exchange);
+        } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
         }
     }
 }

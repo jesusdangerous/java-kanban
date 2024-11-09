@@ -108,16 +108,12 @@ public class EpicHandler extends BaseHttpHandler {
     private void handleUpdateEpic(HttpExchange exchange, String body) throws IOException {
         try {
             Epic epic = gson.fromJson(body, Epic.class);
-            if (taskManager.getEpicById(epic.getId()) != null) {
-                taskManager.updateEpic(epic);
-                sendCreated(exchange, "Эпик обновлен");
-            } else {
-                sendNotFound(exchange);
-            }
+            taskManager.updateEpic(epic);
+            sendCreated(exchange, "Эпик обновлен");
+        } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange);
-        } catch (IllegalArgumentException e) {
-            sendHasInteractions(exchange);
         }
     }
 
@@ -128,14 +124,12 @@ public class EpicHandler extends BaseHttpHandler {
         }
         try {
             Integer epicId = Integer.parseInt(splitStrings[2]);
-            if (taskManager.getEpicById(epicId) != null) {
-                taskManager.deleteEpicById(epicId);
-                sendText(exchange, "Эпик удален");
-            } else {
-                sendNotFound(exchange);
-            }
+            taskManager.deleteEpicById(epicId);
+            sendText(exchange, "Эпик удален");
         } catch (NumberFormatException e) {
             sendBadRequest(exchange);
+        } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
         }
     }
 }

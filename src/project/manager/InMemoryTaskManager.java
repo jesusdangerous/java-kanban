@@ -1,5 +1,6 @@
 package project.manager;
 
+import project.exceptions.TaskTimeConflictException;
 import project.taskStatus.Status;
 import project.taskType.Epic;
 import project.taskType.Subtask;
@@ -73,7 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.removeIf(task -> task.getId().equals(oldTask.getId()));
         if (hasIntersections(updatedTask)) {
             prioritizedTasks.add(oldTask);
-            throw new IllegalArgumentException("Task with id=%s has intersection".formatted(taskId));
+            throw new TaskTimeConflictException("Task with id=%s has intersection".formatted(taskId));
         }
         tasks.put(taskId, updatedTask);
         prioritizedTasks.add(updatedTask);
@@ -86,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.remove(id);
             historyManager.remove(id);
         } else {
-            System.out.println("Ошибка: задача с таким id не существует");
+            throw new IllegalArgumentException("No task by id %s".formatted(id));
         }
     }
 
@@ -130,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicTime(epic);
                 addTaskInPrioritizedTasks(subtask);
             } else {
-                System.out.println("Ошибка: такой эпик не обнаружен");
+                throw new IllegalArgumentException("No subtask by id %s".formatted(id));
             }
         } else {
             System.out.println("Ошибка: попытка добавить пустую подзадачу");
@@ -156,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.removeIf(task -> task.getId().equals(oldSubtask.getId()));
         if (hasIntersections(subtask)) {
             prioritizedTasks.add(oldSubtask);
-            throw new IllegalArgumentException("Subtask with id=%s has intersection".formatted(subtaskId));
+            throw new TaskTimeConflictException("Subtask with id=%s has intersection".formatted(subtaskId));
         }
         subtasks.put(subtaskId, subtask);
         prioritizedTasks.add(subtask);
@@ -179,7 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicTime(epic);
             historyManager.remove(id);
         } else {
-            System.out.println("Ошибка: такой id не найден");
+            throw new IllegalArgumentException("No subtask by id %s".formatted(id));
         }
     }
 
@@ -254,7 +255,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.setName(updatedEpic.getName());
                 epic.setDescription(updatedEpic.getDescription());
             } else {
-                System.out.println("Ошибка: эпик с таким id не существует");
+                throw new IllegalArgumentException("No epic by id %s".formatted(id));
             }
         } else {
             System.out.println("Ошибка: попытка обновить эпик пустым значением");
@@ -274,7 +275,7 @@ public class InMemoryTaskManager implements TaskManager {
             });
             historyManager.remove(id);
         } else {
-            System.out.println("Ошибка: эпик с таким id не существует");
+            throw new IllegalArgumentException("No epic by id %s".formatted(id));
         }
     }
 

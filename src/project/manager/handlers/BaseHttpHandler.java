@@ -18,70 +18,115 @@ public abstract class BaseHttpHandler implements HttpHandler {
         gson = Managers.getGson();
     }
 
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendText(HttpExchange exchange, String text) {
+        try (exchange) {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(200, resp.length);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при отправке данных");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendCreated(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(201, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendCreated(HttpExchange exchange, String text) {
+        try (exchange) {
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(201, resp.length);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при создании ресурса");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendNotFound(HttpExchange exchange) throws IOException {
-        String text = "Объект не был найден";
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(404, 0);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendNotFound(HttpExchange exchange) {
+        try (exchange) {
+            String text = "Объект не был найден";
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(404, 0);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при обработке запроса");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendHasInteractions(HttpExchange exchange) throws IOException {
-        String text = "Задача пересекается с уже существующими";
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(406, 0);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendHasInteractions(HttpExchange exchange) {
+        try (exchange) {
+            String text = "Задача пересекается с уже существующими";
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(406, 0);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при обработке запроса");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendInternalServerError(HttpExchange exchange) throws IOException {
-        String text = "Произошла ошибка при обработке запроса";
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(500, 0);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendInternalServerError(HttpExchange exchange) {
+        try (exchange) {
+            String text = "Произошла ошибка при обработке запроса";
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(500, 0);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при обработке запроса");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendBadRequest(HttpExchange exchange) throws IOException {
-        String text = "Некорректный запрос";
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(400, resp.length);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendBadRequest(HttpExchange exchange) {
+        try (exchange) {
+            String text = "Некорректный запрос";
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(400, resp.length);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при обработке запроса");
+        } finally {
+            exchange.close();
+        }
     }
 
-    protected void sendMethodNotAllowed(HttpExchange exchange) throws IOException {
-        String text = "Эндпоинт не существует";
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        exchange.sendResponseHeaders(405, 0);
-        exchange.getResponseBody().write(resp);
-        exchange.close();
+    protected void sendMethodNotAllowed(HttpExchange exchange) {
+        try (exchange) {
+            String text = "Эндпоинт не существует";
+            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(405, 0);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            handleError(exchange, "Произошла ошибка при обработке запроса");
+        } finally {
+            exchange.close();
+        }
+    }
+
+    private void handleError(HttpExchange exchange, String errorMessage) {
+        try (exchange) {
+            byte[] resp = errorMessage.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+            exchange.sendResponseHeaders(500, resp.length);
+            exchange.getResponseBody().write(resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     protected Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] splitStrings = requestPath.split("/");
-
         switch (requestMethod) {
             case "GET" -> {
                 switch (splitStrings[1]) {

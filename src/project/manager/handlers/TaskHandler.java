@@ -2,6 +2,7 @@ package project.manager.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
+import project.exceptions.TaskTimeConflictException;
 import project.manager.TaskManager;
 
 import java.io.IOException;
@@ -85,15 +86,13 @@ public class TaskHandler extends BaseHttpHandler {
     private void handleUpdateTask(HttpExchange exchange, String body) throws IOException {
         try {
             Task task = gson.fromJson(body, Task.class);
-            if (taskManager.getTaskById(task.getId()) != null) {
-                taskManager.updateTask(task);
-                sendCreated(exchange, "Задача обновлена");
-            } else {
-                sendNotFound(exchange);
-            }
+            taskManager.updateTask(task);
+            sendCreated(exchange, "Задача обновлена");
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange);
         } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
+        } catch (TaskTimeConflictException e) {
             sendHasInteractions(exchange);
         }
     }
@@ -104,15 +103,13 @@ public class TaskHandler extends BaseHttpHandler {
             return;
         }
         try {
-            int taskId = Integer.parseInt(splitStrings[2]);
-            if (taskManager.getTaskById(taskId) != null) {
-                taskManager.deleteTask(taskId);
-                sendText(exchange, "Задача удалена");
-            } else {
-                sendNotFound(exchange);
-            }
+            Integer taskId = Integer.parseInt(splitStrings[2]);
+            taskManager.deleteTask(taskId);
+            sendText(exchange, "Задача удалена");
         } catch (NumberFormatException e) {
             sendBadRequest(exchange);
+        } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
         }
     }
 }

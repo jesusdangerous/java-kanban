@@ -87,7 +87,7 @@ public class HttpTaskServerTest {
         String taskToJson2 = gson.toJson(task2);
 
         HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/tasks"))
+                .uri(URI.create(URL + "/tasks/1"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
                 .build();
@@ -191,7 +191,7 @@ public class HttpTaskServerTest {
         String epicToJson1 = gson.toJson(epic1);
 
         HttpRequest request1 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/tasks"))
+                .uri(URI.create(URL + "/epics"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(epicToJson1))
                 .build();
@@ -206,7 +206,7 @@ public class HttpTaskServerTest {
         String taskToJson2 = gson.toJson(epic2);
 
         HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/epics"))
+                .uri(URI.create(URL + "/epics/1"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
                 .build();
@@ -411,7 +411,7 @@ public class HttpTaskServerTest {
         String taskToJson2 = gson.toJson(subtask2);
 
         HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/subtasks"))
+                .uri(URI.create(URL + "/subtasks/1"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
                 .build();
