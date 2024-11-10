@@ -34,11 +34,8 @@ public class EpicHandler extends BaseHttpHandler {
                 case GET_EPIC_SUBTASKS:
                     handleGetAllSubtasksInEpic(exchange, splitStrings);
                     break;
-                case POST_ADD_EPIC:
-                    handleAddEpic(exchange, body);
-                    break;
-                case POST_UPDATE_EPIC:
-                    handleUpdateEpic(exchange, body);
+                case POST_ADD_OR_UPDATE_EPIC:
+                    handleAddOrUpdateEpic(exchange, body);
                     break;
                 case DELETE_EPIC:
                     handleDeleteEpic(exchange, splitStrings);
@@ -93,27 +90,20 @@ public class EpicHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleAddEpic(HttpExchange exchange, String body) throws IOException {
+    private void handleAddOrUpdateEpic(HttpExchange exchange, String body) throws IOException {
         try {
             Epic epic = gson.fromJson(body, Epic.class);
-            taskManager.addNewEpic(epic);
-            sendCreated(exchange, "Эпик добавлен");
+            if (taskManager.getEpicById(epic.getId()) == null) {
+                taskManager.addNewEpic(epic);
+                sendCreated(exchange, "Эпик добавлен");
+            } else {
+                taskManager.updateEpic(epic);
+                sendCreated(exchange, "Эпик обновлен");
+            }
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange);
         } catch (NullPointerException e) {
             sendNotFound(exchange);
-        }
-    }
-
-    private void handleUpdateEpic(HttpExchange exchange, String body) throws IOException {
-        try {
-            Epic epic = gson.fromJson(body, Epic.class);
-            taskManager.updateEpic(epic);
-            sendCreated(exchange, "Эпик обновлен");
-        } catch (IllegalArgumentException e) {
-            sendNotFound(exchange);
-        } catch (JsonSyntaxException e) {
-            sendBadRequest(exchange);
         }
     }
 

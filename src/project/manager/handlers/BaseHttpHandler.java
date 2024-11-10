@@ -167,28 +167,12 @@ public abstract class BaseHttpHandler implements HttpHandler {
                 }
             }
             case "POST" -> {
-                switch (splitStrings[1]) {
-                    case "tasks":
-                        if (splitStrings.length == 3) {
-                            return Endpoint.POST_UPDATE_TASK;
-                        } else {
-                            return Endpoint.POST_ADD_TASK;
-                        }
-                    case "subtasks":
-                        if (splitStrings.length == 3) {
-                            return Endpoint.POST_UPDATE_SUBTASK;
-                        } else {
-                            return Endpoint.POST_ADD_SUBTASK;
-                        }
-                    case "epics":
-                        if (splitStrings.length == 3) {
-                            return Endpoint.POST_UPDATE_EPIC;
-                        } else {
-                            return Endpoint.POST_ADD_EPIC;
-                        }
-                    default:
-                        return Endpoint.UNKNOWN;
-                }
+                return switch (splitStrings[1]) {
+                    case "tasks" -> Endpoint.POST_ADD_OR_UPDATE_TASK;
+                    case "subtasks" -> Endpoint.POST_ADD_OR_UPDATE_SUBTASK;
+                    case "epics" -> Endpoint.POST_ADD_OR_UPDATE_EPIC;
+                    default -> Endpoint.UNKNOWN;
+                };
             }
             case "DELETE" -> {
                 return switch (splitStrings[1]) {

@@ -31,11 +31,8 @@ public class SubtaskHandler extends BaseHttpHandler {
                 case GET_SUBTASKS:
                     handleGetAllSubtasks(exchange);
                     break;
-                case POST_ADD_SUBTASK:
-                    handleAddSubtask(exchange, body);
-                    break;
-                case POST_UPDATE_SUBTASK:
-                    handleUpdateSubtask(exchange, body);
+                case POST_ADD_OR_UPDATE_SUBTASK:
+                    handleAddOrUpdateSubtask(exchange, body);
                     break;
                 case DELETE_SUBTASK:
                     handleDeleteSubtask(exchange, splitStrings);
@@ -71,29 +68,23 @@ public class SubtaskHandler extends BaseHttpHandler {
         sendText(exchange, gson.toJson(subtasks));
     }
 
-    private void handleAddSubtask(HttpExchange exchange, String body) throws IOException {
+    private void handleAddOrUpdateSubtask(HttpExchange exchange, String body) throws IOException {
         try {
             Subtask subtask = gson.fromJson(body, Subtask.class);
-            taskManager.addNewSubtask(subtask);
-            sendCreated(exchange, "Подзадача добавлена");
+            System.out.println(subtask);
+            if (taskManager.getSubtaskById(subtask.getId()) == null) {
+                taskManager.addNewSubtask(subtask);
+                sendCreated(exchange, "Подзадача добавлена");
+            } else {
+                taskManager.updateSubtask(subtask);
+                sendCreated(exchange, "Подзача обновлена");
+            }
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange);
-        } catch (NullPointerException e) {
-            sendNotFound(exchange);
-        }
-    }
-
-    private void handleUpdateSubtask(HttpExchange exchange, String body) throws IOException {
-        try {
-            Subtask subtask = gson.fromJson(body, Subtask.class);
-            taskManager.updateSubtask(subtask);
-            sendCreated(exchange, "Подзача обновлена");
-        } catch (JsonSyntaxException e) {
-            sendBadRequest(exchange);
-        } catch (IllegalArgumentException e) {
-            sendNotFound(exchange);
         } catch (TaskTimeConflictException e) {
             sendHasInteractions(exchange);
+        } catch (IllegalArgumentException e) {
+            sendNotFound(exchange);
         }
     }
 

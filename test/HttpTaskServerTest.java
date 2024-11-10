@@ -200,20 +200,22 @@ public class HttpTaskServerTest {
 
         Assertions.assertEquals(201, response.statusCode());
 
-        Epic epic2 = new Epic("Эпик1", "Сделать1", Status.NEW);
+        Epic epic2 = new Epic("Эпик2", "Сделать2", Status.NEW);
         epic2.setId(1);
 
         String taskToJson2 = gson.toJson(epic2);
 
         HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/epics/1"))
+                .uri(URI.create(URL + "/epics"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
                 .build();
 
         HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
 
-        Epic expectedTask = new Epic("Эпик1", "Сделать1", Status.NEW);
+        Assertions.assertEquals(201, response2.statusCode());
+
+        Epic expectedTask = new Epic("Эпик2", "Сделать2", Status.NEW);
         expectedTask.setId(1);
 
         Assertions.assertEquals(expectedTask, taskManager.getEpicById(1));
@@ -366,7 +368,6 @@ public class HttpTaskServerTest {
         taskManager.addNewEpic(epic1);
 
         Subtask subtask1 = new Subtask("Задача2", "Сделать2", Status.NEW, epic1.getId());
-        taskManager.addNewSubtask(subtask1);
 
         String subtaskToJson = gson.toJson(subtask1);
 
@@ -390,8 +391,8 @@ public class HttpTaskServerTest {
         Epic epic1 = new Epic("Задача1", "Сделать1", Status.NEW);
         taskManager.addNewEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Задача2", "Сделать2", Status.NEW, epic1.getId());
-        taskManager.addNewSubtask(subtask1);
+        Subtask subtask1 = new Subtask("Задача2", "Сделать2", Status.NEW, epic1.getId(),
+                LocalDateTime.of(2024, 10, 21, 10, 0), Duration.ofHours(2));
 
         String subtaskToJson1 = gson.toJson(subtask1);
 
@@ -405,20 +406,24 @@ public class HttpTaskServerTest {
 
         Assertions.assertEquals(201, response.statusCode());
 
-        Subtask subtask2 = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId(),
+                LocalDateTime.of(2024, 10, 21, 10, 0), Duration.ofHours(2));
         subtask2.setId(2);
 
-        String taskToJson2 = gson.toJson(subtask2);
+        String subtaskToJson2 = gson.toJson(subtask2);
 
         HttpRequest request2 = HttpRequest.newBuilder()
-                .uri(URI.create(URL + "/subtasks/1"))
+                .uri(URI.create(URL + "/subtasks"))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(taskToJson2))
+                .POST(HttpRequest.BodyPublishers.ofString(subtaskToJson2))
                 .build();
 
         HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
 
-        Subtask expectedTask = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId());
+        Assertions.assertEquals(201, response2.statusCode());
+
+        Subtask expectedTask = new Subtask("Задача3", "Сделать3", Status.NEW, epic1.getId(),
+                LocalDateTime.of(2024, 10, 21, 10, 0), Duration.ofHours(2));
         expectedTask.setId(2);
 
         Assertions.assertEquals(expectedTask, taskManager.getSubtaskById(2));
