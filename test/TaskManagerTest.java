@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import project.exceptions.TaskTimeConflictException;
 import project.manager.TaskManager;
 import project.taskStatus.Status;
 import project.taskType.Epic;
@@ -292,7 +293,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Task taskToUpdate = new Task("Задача1", "Описание1", Status.NEW, startTime.plus(oneHour), oneHour);
         taskToUpdate.setId(task.getId());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Assertions.assertThrows(TaskTimeConflictException.class, () -> {
             taskManager.updateTask(taskToUpdate);
         }, "Task with id=1 has intersection");
 
@@ -315,7 +316,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2024, 10, 22, 15, 0), Duration.ofHours(2));
         subtaskToUpdate1.setId(subtask1.getId());
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Assertions.assertThrows(TaskTimeConflictException.class, () -> {
             taskManager.updateSubtask(subtaskToUpdate1);
         }, "Subtask with id=2 has intersection");
 
